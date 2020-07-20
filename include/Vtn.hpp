@@ -12,10 +12,10 @@ struct Vec2
 	T y;
 };
 
-struct Vtn
+struct Ventana
 {
-	~Vtn();
-	Vtn(Vec2<int> size, const wchar_t *title);
+	~Ventana();
+	Ventana(Vec2<int> size, const wchar_t *title);
 	bool operator >>(std::deque<std::string> &events);
 	void close();
 private:

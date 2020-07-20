@@ -3,13 +3,13 @@
 
 const wchar_t *className = L"uwu";
 
-Vtn::~Vtn()
+Ventana::~Ventana()
 {
 	DestroyWindow(m_handle);
 	DestroyCursor(m_cursor);
 }
 
-Vtn::Vtn(Vec2<int> size, const wchar_t *title)
+Ventana::Ventana(Vec2<int> size, const wchar_t *title)
 : m_handle(NULL)
 , m_cursor(LoadCursor(NULL, IDC_ARROW))
 , m_windowOpen(true)
@@ -17,7 +17,7 @@ Vtn::Vtn(Vec2<int> size, const wchar_t *title)
 	WNDCLASSW wc;
 	wc.cbClsExtra 	 = 0;
 	wc.cbWndExtra 	 = 0;
-	wc.hbrBackground = (HBRUSH)BLACK_BRUSH;
+	wc.hbrBackground = NULL;
 	wc.hCursor 		 = m_cursor;
 	wc.hIcon 		 = NULL;
 	wc.hInstance 	 = GetModuleHandleW(0);
@@ -42,7 +42,7 @@ Vtn::Vtn(Vec2<int> size, const wchar_t *title)
 	ShowWindow(m_handle, SW_SHOW);
 }
 
-bool Vtn::operator >>(std::deque<std::string> &events)
+bool Ventana::operator >>(std::deque<std::string> &events)
 {
 	checkEvents();
 	events = m_events;
@@ -50,13 +50,14 @@ bool Vtn::operator >>(std::deque<std::string> &events)
 	return m_windowOpen;
 }
 
-void Vtn::close()
+void Ventana::close()
 {
 	PostQuitMessage(0);
+	this->~Ventana();
 	m_windowOpen = false;
 }
 
-void Vtn::checkEvents()
+void Ventana::checkEvents()
 {
 	MSG msg;
 	while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
@@ -66,7 +67,7 @@ void Vtn::checkEvents()
 	}
 }
 
-void Vtn::checkEvents(UINT msg, WPARAM wParam, LPARAM lParam)
+void Ventana::checkEvents(UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
@@ -77,7 +78,7 @@ void Vtn::checkEvents(UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 }
 
-LRESULT CALLBACK Vtn::OnEvent(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Ventana::OnEvent(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (msg == WM_CREATE)
 	{
@@ -85,9 +86,9 @@ LRESULT CALLBACK Vtn::OnEvent(HWND handle, UINT msg, WPARAM wParam, LPARAM lPara
 		SetWindowLongPtrW(handle, GWLP_USERDATA, window);
 	}
 
-	Vtn *vtn = handle? reinterpret_cast<Vtn*>(GetWindowLongPtr(handle, GWLP_USERDATA)) : NULL;
+	Ventana *ventana = handle? reinterpret_cast<Ventana*>(GetWindowLongPtr(handle, GWLP_USERDATA)) : NULL;
 
-	if (vtn) vtn->checkEvents(msg, wParam, lParam);
+	if (ventana) ventana->checkEvents(msg, wParam, lParam);
 
 	if (msg == WM_CLOSE)
 		return 0;
